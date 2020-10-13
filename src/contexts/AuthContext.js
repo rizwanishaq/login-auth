@@ -9,27 +9,49 @@ export const useAuth = () => {
 
 const AuthContextProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setCurrentUser(user);
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
 
   const signup = async (email, password) => {
     return await auth.createUserWithEmailAndPassword(email, password);
   };
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setCurrentUser(user);
-    });
+  const login = async (email, password) => {
+    return auth.signInWithEmailAndPassword(email, password);
+  };
 
-    return unsubscribe;
-  }, []);
+  const logout = async () => {
+    return auth.signOut();
+  };
+
+  const resetPassword = async (email) => {
+    return auth.sendPasswordResetEmail(email);
+  };
+
+  const updatePassword = async (password) => {
+    return currentUser.updatePassword(password);
+  };
 
   return (
     <AuthContext.Provider
       value={{
         currentUser,
         signup,
+        login,
+        logout,
+        resetPassword,
+        updatePassword,
       }}
     >
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

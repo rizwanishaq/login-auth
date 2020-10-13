@@ -3,14 +3,14 @@ import { Card, Button, Form, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-const SignUp = ({ history }) => {
+const UpdateProfile = ({ history }) => {
   const emailRef = useRef();
   const passwordRef = useRef();
   const passwordConfirmRef = useRef();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { signup } = useAuth();
+  const { currentUser, updatePassword } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +21,7 @@ const SignUp = ({ history }) => {
     try {
       setError("");
       setLoading(true);
-      await signup(emailRef.current.value, passwordRef.current.value);
+      await updatePassword(passwordRef.current.value);
       setLoading(false);
       history.push("/");
     } catch (err) {
@@ -34,12 +34,18 @@ const SignUp = ({ history }) => {
     <>
       <Card>
         <Card.Body>
-          <h2 className="text-center mb-4">Sign Up</h2>
+          <h2 className="text-center mb-4">Update Profile</h2>
           {error && <Alert variant="danger">{error}</Alert>}
           <Form onSubmit={handleSubmit}>
             <Form.Group id="email">
               <Form.Label>Email</Form.Label>
-              <Form.Control type="email" ref={emailRef} required></Form.Control>
+              <Form.Control
+                type="email"
+                ref={emailRef}
+                required
+                defaultValue={currentUser.email}
+                disabled
+              ></Form.Control>
             </Form.Group>
             <Form.Group id="password">
               <Form.Label>Password</Form.Label>
@@ -47,6 +53,7 @@ const SignUp = ({ history }) => {
                 type="password"
                 ref={passwordRef}
                 required
+                placeholder="Leave blank to keep the same"
               ></Form.Control>
             </Form.Group>
             <Form.Group id="password-confirm">
@@ -58,16 +65,16 @@ const SignUp = ({ history }) => {
               ></Form.Control>
             </Form.Group>
             <Button type="submit" className="w-100" disabled={loading}>
-              Sign Up
+              Update
             </Button>
           </Form>
         </Card.Body>
       </Card>
       <div className="w-100 text-center mt-2">
-        Already have an account? <Link to="/login">Log In</Link>
+        <Link to="/">Cancel</Link>
       </div>
     </>
   );
 };
 
-export default SignUp;
+export default UpdateProfile;

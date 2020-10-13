@@ -3,27 +3,24 @@ import { Card, Button, Form, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
-const SignUp = ({ history }) => {
+const ForgotPassword = ({ history }) => {
   const emailRef = useRef();
-  const passwordRef = useRef();
-  const passwordConfirmRef = useRef();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const { signup } = useAuth();
+  const { resetPassword } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (passwordRef.current.value !== passwordConfirmRef.current.value) {
-      return setError("Password do not match");
-    }
 
     try {
+      setMessage("");
       setError("");
       setLoading(true);
-      await signup(emailRef.current.value, passwordRef.current.value);
+      await resetPassword(emailRef.current.value);
+      setMessage("Check your inbox for further instructions");
       setLoading(false);
-      history.push("/");
     } catch (err) {
       setError(err.message);
       setLoading(false);
@@ -34,40 +31,29 @@ const SignUp = ({ history }) => {
     <>
       <Card>
         <Card.Body>
-          <h2 className="text-center mb-4">Sign Up</h2>
+          <h2 className="text-center mb-4">Forgot Reset</h2>
           {error && <Alert variant="danger">{error}</Alert>}
+          {message && <Alert variant="success">{message}</Alert>}
           <Form onSubmit={handleSubmit}>
             <Form.Group id="email">
               <Form.Label>Email</Form.Label>
               <Form.Control type="email" ref={emailRef} required></Form.Control>
             </Form.Group>
-            <Form.Group id="password">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                type="password"
-                ref={passwordRef}
-                required
-              ></Form.Control>
-            </Form.Group>
-            <Form.Group id="password-confirm">
-              <Form.Label>Password Confirmation</Form.Label>
-              <Form.Control
-                type="password"
-                ref={passwordConfirmRef}
-                required
-              ></Form.Control>
-            </Form.Group>
+
             <Button type="submit" className="w-100" disabled={loading}>
-              Sign Up
+              Reset Password
             </Button>
           </Form>
+          <div className="w-100 text-center mt-3">
+            <Link to="/login">Login</Link>
+          </div>
         </Card.Body>
       </Card>
       <div className="w-100 text-center mt-2">
-        Already have an account? <Link to="/login">Log In</Link>
+        Need an account? <Link to="/signup">Sign Up</Link>
       </div>
     </>
   );
 };
 
-export default SignUp;
+export default ForgotPassword;
